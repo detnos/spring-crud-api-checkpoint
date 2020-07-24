@@ -2,6 +2,7 @@ package com.galvanize.User;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -34,34 +35,46 @@ public class UserController {
         return user.get();
     }
 
-//    @PatchMapping("/{id}")
-//    public User update(@RequestBody User user, @PathVariable Map<String, String> querystring) {
-//        User updatedUser = new User();
-//
-//        String strId = querystring.get("id");
-//        Long id = Long.parseLong(strId);
-//        Optional<User> userFromRepo = this.repository.findById(id);
-//
-//        updatedUser.setId(userFromRepo.get().getId());
-//        updatedUser.setDeliveredOn(lesson.getDeliveredOn());
-//        updatedUser.setTitle(lesson.getTitle());
-//
-//        return this.repository.save(updatedUser);
-//    }
+    @PatchMapping("/{id}")
+    public User update(@RequestBody User user, @PathVariable Map<String, String> querystring) {
 
-//    @DeleteMapping("/{id}")
-//    public String delete(@PathVariable Map<String, String> querystring) {
-//        String result = "no matches found to delete.";
-//        String strId = querystring.get("id");
-//        Long id = Long.parseLong(strId);
-//        Optional<User> user = this.repository.findById(id);
-//
-//        if (user.toString() != "Optional.empty") {
-//            this.repository.delete(user.get());
-//            result = "The user with id " + strId + " has been deleted.";
-//        }
-//
-//        return result;
-//    }
+        String strId = querystring.get("id");
+        Long id = Long.parseLong(strId);
+        Optional<User> userFromRepo = this.repository.findById(id);
+
+        if (user.getEmail() != null) {
+            userFromRepo.get().setEmail(user.getEmail());
+        }
+        if (user.getPassword() != null) {
+            userFromRepo.get().setPassword(user.getPassword());
+        }
+
+        return this.repository.save(userFromRepo.get());
+    }
+
+    @DeleteMapping("/{id}")
+    public HashMap<String, Integer> delete(@PathVariable Map<String, String> querystring) {
+        HashMap<String, Integer> result = new HashMap<>();
+
+        String strId = querystring.get("id");
+        Long id = Long.parseLong(strId);
+        Optional<User> user = this.repository.findById(id);
+
+
+        if (user.toString() != "Optional.empty") {
+            this.repository.delete(user.get());
+            Iterable<User> all = this.repository.findAll();
+            Integer count = 0;
+            for (User u: all ) { count++; }
+
+            result.put("count", count);
+        } else {
+            result.put("no-action taken; user not found with id " + strId, 0);
+        }
+
+        return result;
+    }
+
+
 
 }
