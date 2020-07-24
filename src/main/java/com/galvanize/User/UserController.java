@@ -36,7 +36,10 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public User update(@RequestBody User user, @PathVariable Map<String, String> querystring) {
+    public User update(
+            @RequestBody User user,
+            @PathVariable Map<String, String> querystring
+    ) {
 
         String strId = querystring.get("id");
         Long id = Long.parseLong(strId);
@@ -53,7 +56,9 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public HashMap<String, Integer> delete(@PathVariable Map<String, String> querystring) {
+    public HashMap<String, Integer> delete(
+            @PathVariable Map<String, String> querystring
+    ) {
         HashMap<String, Integer> result = new HashMap<>();
 
         String strId = querystring.get("id");
@@ -75,6 +80,21 @@ public class UserController {
         return result;
     }
 
+    @PostMapping("authenticate")
+    public User.UserAuth authenticate(@RequestBody User user) {
+        User.UserAuth auth = new User.UserAuth();
 
+        User userFromRepo = this.repository.findByEmail(user.getEmail());
+
+        if (user.getPassword().equals(userFromRepo.getPassword())) {
+            auth.setAuthenticated(true);
+            auth.setUser(userFromRepo);
+        } else {
+            //if no user OR if passwords do not match return only authentication : false
+            auth.setAuthenticated(false);
+        }
+
+        return auth;
+    }
 
 }

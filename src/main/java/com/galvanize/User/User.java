@@ -1,6 +1,7 @@
 package com.galvanize.User;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -37,5 +38,27 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    static class UserAuth {
+        private boolean authenticated = false;
+        private User user;
+
+        public boolean isAuthenticated() {
+            return authenticated;
+        }
+
+        public void setAuthenticated(boolean authenticated) {
+            this.authenticated = authenticated;
+        }
+
+        public User getUser() {
+            return user;
+        }
+
+        public void setUser(User user) {
+            this.user = user;
+        }
     }
 }
